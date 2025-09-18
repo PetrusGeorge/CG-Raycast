@@ -1,0 +1,6 @@
+obj
+raycast
+.cache
+
+flake.nix
+flake.lock
