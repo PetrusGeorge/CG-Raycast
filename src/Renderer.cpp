@@ -1,11 +1,13 @@
 #include "Renderer.h"
 
+#include <algorithm>
 #include <cerrno>
 #include <cmath>
 #include <iostream>
 #include <iterator>
+#include <vector>
 
-// Triangle method implementations
+// Função que checa a interseção de um raio com um triangulo
 std::optional<float> Triangle::ray_intersect(const Vector3 &ray_origin, const Vector3 &ray_dir) const {
     const float epsilon = 0.0000001;
     const Vector3 edge1 = v1 - v0;
@@ -40,12 +42,14 @@ std::optional<float> Triangle::ray_intersect(const Vector3 &ray_origin, const Ve
     return {t};
 }
 
+// Retorna normal de um triangulo sem se preocupar com o sentido
 Vector3 Triangle::get_normal() const {
     const Vector3 edge1 = v1 - v0;
     const Vector3 edge2 = v2 - v0;
     return edge1.cross(edge2).normalized();
 }
 
+// Inicializa o renderizador com o cenário presente
 void Renderer::init(int argc, char **argv) const {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB);
@@ -64,42 +68,51 @@ void Renderer::init(int argc, char **argv) const {
     glutMainLoop();
 }
 
+// Funções para criar o cenário
+void Renderer::set_ambient(float ambient) {
+    m_ambient = ambient;
+}
 void Renderer::add_triangle(const Triangle &triangle) { m_primitives.push_back(triangle); }
 void Renderer::add_object(std::vector<Triangle> object) {
     m_primitives.insert(m_primitives.end(), std::make_move_iterator(object.begin()),
                         std::make_move_iterator(object.end()));
 }
+void Renderer::add_light(const Light& light) { m_lights.push_back(light); }
+void Renderer::add_lights(std::vector<Light> lights) {
+    m_lights.insert(m_lights.end(), std::make_move_iterator(lights.begin()),
+                        std::make_move_iterator(lights.end()));
+}
 
-// Static wrapper functions
 void Renderer::display_wrapper() { Renderer::get_instance().render(); }
 void Renderer::reshape_wrapper(int w, int h) { Renderer::get_instance().reshape(w, h); }
 void Renderer::keyboard_wrapper(unsigned char key, int x, int y) { Renderer::get_instance().keyboard(key, x, y); }
 void Renderer::special_keys_wrapper(int key, int x, int y) { Renderer::get_instance().special_keys(key, x, y); }
 
-// Instance methods
 void Renderer::render() {
+    // Redimensiona o buffer da imagem caso haja redimensionamento da tela
     if (m_pixel_buffer.size() != m_window_width * m_window_height * 3) {
         m_pixel_buffer.resize(m_window_width * m_window_height * 3);
     }
 
+// Paraleliza o for externo com OpenMP
 #pragma omp parallel for
-    for (int y = 0; y < m_window_height; ++y) {
-        for (int x = 0; x < m_window_width; ++x) {
+    // Percorre cada pixel da tela calculando o raio e sua interseção
+    for (int x = 0; x < m_window_width; x++) {
+        for (int y = 0; y < m_window_height; y++) {
             const Vector3 ray_dir = m_camera.get_ray_direction(x, y, m_window_width, m_window_height);
             const Color pixel_color = trace_ray(m_camera.position, ray_dir);
 
-            // Calculate buffer index (flip Y coordinate for OpenGL)
+            // Calcula o index para buffer
             const int buffer_y = m_window_height - y - 1;
             const int index = (buffer_y * m_window_width + x) * 3;
 
-            // Store pixel in buffer
             m_pixel_buffer[index] = static_cast<GLubyte>(pixel_color.r * 255);
             m_pixel_buffer[index + 1] = static_cast<GLubyte>(pixel_color.g * 255);
             m_pixel_buffer[index + 2] = static_cast<GLubyte>(pixel_color.b * 255);
         }
     }
 
-    // Clear and draw pixels
+    // Desenha a imagem na tela
     glClear(GL_COLOR_BUFFER_BIT);
     glDrawPixels(m_window_width, m_window_height, GL_RGB, GL_UNSIGNED_BYTE, m_pixel_buffer.data());
     glutSwapBuffers();
@@ -142,7 +155,7 @@ void Renderer::keyboard(unsigned char key, int /*x*/, int /*y*/) {
         break;
     case 27:
         exit(0);
-        break; // ESC key
+        break;
     }
     glutPostRedisplay();
 }
@@ -170,6 +183,7 @@ Color Renderer::trace_ray(const Vector3 &origin, const Vector3 &direction) {
     float closest_t = INFINITY;
     int closest_idx = -1;
 
+    // Checa interseção do raio com todas as primitivas e escolhe a mais próxima
     for (int i = 0; i < m_primitives.size(); i++) {
         const Triangle &triangle = m_primitives[i];
         if (auto t = triangle.ray_intersect(origin, direction)) {
@@ -180,32 +194,67 @@ Color Renderer::trace_ray(const Vector3 &origin, const Vector3 &direction) {
         }
     }
 
-    if (closest_idx >= 0) {
-        const Triangle &closest_triangle = m_primitives[closest_idx];
-        const Vector3 hit_point = origin + direction * closest_t;
-        const Vector3 normal = closest_triangle.get_normal();
+    // Caso não haja interseção no passo anterior retorna cor de fundo padrão
+    if (closest_idx == -1) {
+        return m_background_color;
+    }
 
-        const Vector3 light_pos(0.0F, 10.0F, 0.0F);
-        // const Vector3 light_pos = m_camera.position;
-        const Vector3 to_light = (light_pos - hit_point).normalized();
+    const Triangle &closest_triangle = m_primitives[closest_idx];
 
+    // Ponto exato de interseção com o triângulo mais próximo
+    const Vector3 hit_point = origin + direction * closest_t;
+
+    Vector3 normal = closest_triangle.get_normal();
+    // Aponta normal para direção da camera
+    if (normal.dot(direction) > 0) {
+        normal = normal * -1;
+    }
+
+    std::vector<float> intensities;
+    // Avalia o impacto de cada luz na intensidade do raio
+    for (auto& light : m_lights) {
+        bool hit = false;
+        Vector3 to_light = (light.pos - hit_point);
+        const float light_t = to_light.length();
+        to_light = to_light.normalized();
+
+        // Shadow ray, checa colisão a partir do ponto de interseção até a luz
+        // caso haja um triângulo no caminho o raio é uma sombra para aquela luz
         for (int i = 0; i < m_primitives.size(); i++) {
+            // Evita checar com o próprio triangulo
             if (i == closest_idx) {
                 continue;
             }
+            
             const Triangle &triangle = m_primitives[i];
             if (auto t = triangle.ray_intersect(hit_point, to_light)) {
-                return closest_triangle.color * 0.2F;
+                // Caso o ponto de interseção seja após o ponto de posição da luz
+                // essa interseção não deve ser contada
+                if (t > light_t) {
+                    continue;
+                }
+                hit = true;
+                break;
             }
         }
-        // std::cout << normal.dot(to_light) << '\n';
-        float intensity = std::max(0.0F, abs(normal.dot(to_light)));
 
-        const float ambient = 0.2F;
-        intensity = ambient + (1.0F - ambient) * intensity;
-
-        return closest_triangle.color * intensity;
+        const float intensity = normal.dot(to_light);
+        
+        // Caso o produto seja menor que 0 a luz esta no lado contrario ao triângulo
+        // e portanto não deve interferir na intensidade
+        if (!hit && intensity > 0) {
+            intensities.push_back(intensity);
+        } else {
+            intensities.push_back(0);
+        }
     }
 
-    return m_background_color;
+    // Calulo final da cor, considerando luz ambiente, a cor do objeto e a cor da luz e sua intensidade
+    Color result = closest_triangle.color * m_ambient;
+    for (int i = 0; i < m_lights.size(); i++) {
+        result = result + (m_lights[i].color * closest_triangle.color * (intensities[i] * (1.0F - m_ambient)));
+    }
+    result.saturate(); // Evita overflow
+
+    return result;
 }

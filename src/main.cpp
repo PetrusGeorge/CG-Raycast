@@ -4,7 +4,7 @@
 #include "Renderer.h"
 
 void construct_scene() {
-    // Create a colored cube
+    // Função auxiliar para criar cubos
     auto create_cube = [](const Vector3 &center, float size, const Color &color) {
         std::vector<Triangle> triangles;
         const float half_size = size / 2.0F;
@@ -36,13 +36,17 @@ void construct_scene() {
 
     Renderer &render = Renderer::get_instance();
 
-    // Add cubes to scene
-    render.add_object(create_cube(Vector3(0, 0, 0), 2.0F, Color(0.8F, 0.3F, 0.3F)));
-    render.add_object(create_cube(Vector3(3, 0, -2), 1.0F, Color(0.3F, 0.3F, 0.8F)));
-    render.add_object(create_cube(Vector3(-3, 1, 1), 1.5F, Color(0.8F, 0.8F, 0.3F)));
+    // Constroi cubos para cena
+    render.add_object(create_cube(Vector3(0, -2, -2), 2.0F, Color(0.8F, 0.3F, 0.3F)));
+    render.add_object(create_cube(Vector3(3, -2, -4), 1.0F, Color(0.3F, 0.3F, 0.8F)));
+    render.add_object(create_cube(Vector3(-3, -1, -1), 1.5F, Color(0.8F, 0.8F, 0.3F)));
 
-    // Ground plane
-    render.add_triangle({Vector3(-10, -2, -10), Vector3(10, -2, -10), Vector3(0, -2, 10), Color(0.4F, 0.6F, 0.4F)});
+    // Chão
+    render.add_triangle({Vector3(-10, -5, -10), Vector3(10, -5, -10), Vector3(0, -5, 10), Color(0.4F, 0.6F, 0.4F)});
+
+    // Luzes
+    render.add_light(Light({0.0, 10.0, 0.0}));
+    // render.add_light(Light({0.0, 10.5, 0.0}, {1.0, 0.0, 1.0}));
 }
 
 int main(int argc, char **argv) {

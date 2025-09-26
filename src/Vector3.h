@@ -1,7 +1,7 @@
 #include <cmath>
 
-class Vector3 {
-  public:
+// Classe para representar vetores e pontos
+struct Vector3 {
     float x, y, z;
 
     Vector3() : x(0), y(0), z(0) {}

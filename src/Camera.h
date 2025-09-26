@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath>
 
 #include "Vector3.h"
@@ -10,8 +11,8 @@ struct Camera {
     float fov;
     float aspect_ratio;
 
-    float yaw;   // Rotation around Y axis (left/right)
-    float pitch; // Rotation around X axis (up/down)
+    float yaw;
+    float pitch;
 
     Camera()
         : position(0, 0, 5), forward(0, 0, -1), up(0, 1, 0), fov(60.0), aspect_ratio(1.0),
@@ -24,13 +25,12 @@ struct Camera {
           aspect_ratio(aspect), yaw(atan2f(forward.z, forward.x)), pitch(asinf(forward.y)) {}
 
     void update_vectors() {
-        // Calculate forward vector from yaw and pitch
+        // Calcula z da camera a partir do yaw e pitch
         forward.x = std::cos(yaw) * std::cos(pitch);
         forward.y = std::sin(pitch);
         forward.z = std::sin(yaw) * std::cos(pitch);
         forward = forward.normalized();
 
-        // Calculate right and up vectors
         // TODO: isso aqui ta errado, tem que aplicar a rotacao mesmo
         right = Vector3(0, 1, 0).cross(forward).normalized();
         up = forward.cross(right).normalized();
@@ -40,29 +40,31 @@ struct Camera {
         yaw += delta_yaw;
         pitch += delta_pitch;
 
-        // Clamp pitch to avoid flipping
+        // Evita que a camera gire na vertical
         const float max_pitch = 89.0F * M_PI / 180.0F;
-        pitch = std::max(-max_pitch, std::min(max_pitch, pitch));
+        pitch = std::clamp(pitch, -max_pitch, max_pitch);
 
         update_vectors();
     }
 
     void move(float dx, float dy, float dz) {
-        // Move relative to camera orientation
+        // Movimento da câmera em relação a seus vetores
         position = position + right * dx + up * dy + forward * dz;
     }
 
     Vector3 get_ray_direction(int screen_x, int screen_y, int width, int height) const {
-        // Convert screen coordinates to normalized device coordinates
+        // Converte coordenadas de tela para coordenadas normalizadas de dispositivo
         float ndc_x = (2.0F * screen_x / width - 1.0F) * aspect_ratio;
+
+        // As coordenadas Y são invertidas
         float ndc_y = 1.0F - (2.0F * screen_y / height);
 
-        // Scale by field of view
+        // Aplica o fov para o ângulo de visão
         const float scale = tan(fov * 0.5F * M_PI / 180.0F);
         ndc_x *= scale;
         ndc_y *= scale;
 
-        // Calculate ray direction in world space
+        // Calcula a direção do raio
         return (forward + right * ndc_x + up * ndc_y).normalized();
     }
 };
