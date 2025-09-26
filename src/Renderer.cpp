@@ -237,7 +237,7 @@ Color Renderer::trace_ray(const Vector3 &origin, const Vector3 &direction) {
             }
         }
 
-        const float intensity = normal.dot(to_light);
+        const float intensity = normal.dot(to_light) * (1.0 / (1.0 + light.attenuation_factor * light_t));
         
         // Caso o produto seja menor que 0 a luz esta no lado contrario ao triângulo
         // e portanto não deve interferir na intensidade

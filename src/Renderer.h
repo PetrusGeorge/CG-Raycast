@@ -42,9 +42,12 @@ struct Triangle {
 struct Light {
   Vector3 pos;
   Color color{1,1,1};
+  float attenuation_factor{0};
 
   Light(Vector3 pos) : pos(pos) {};
   Light(Vector3 pos, Color color) : pos(pos), color(color) {};
+  Light(Vector3 pos, float attenuation_factor) : pos(pos), attenuation_factor(attenuation_factor) {};
+  Light(Vector3 pos, Color color, float attenuation_color) : pos(pos), color(color), attenuation_factor(attenuation_factor) {};
 };
 
 // Renderer é uma classe para utilizar o raycasting

@@ -23,12 +23,12 @@ void construct_scene() {
                                      Vector3(center.x - half_size, center.y + half_size, center.z + half_size)};
 
         const int faces[12][3] = {
-            {0, 1, 2}, {0, 2, 3}, // front
-            {4, 6, 5}, {4, 7, 6}, // back
-            {0, 4, 5}, {0, 5, 1}, // bottom
-            {2, 6, 7}, {2, 7, 3}, // top
-            {0, 3, 7}, {0, 7, 4}, // left
-            {1, 5, 6}, {1, 6, 2}  // right
+            {0, 1, 2}, {0, 2, 3}, // face da frente
+            {4, 6, 5}, {4, 7, 6}, // face de trás
+            {0, 4, 5}, {0, 5, 1}, // face de baixo
+            {2, 6, 7}, {2, 7, 3}, // face de cima
+            {0, 3, 7}, {0, 7, 4}, // face da esquerda
+            {1, 5, 6}, {1, 6, 2}  // face da direita
         };
 
         triangles.reserve(12);
@@ -49,8 +49,11 @@ void construct_scene() {
     render.add_triangle({Vector3(-10, -5, -10), Vector3(10, -5, -10), Vector3(0, -5, 10), Color(0.4F, 0.6F, 0.4F)});
 
     // Luzes
-    render.add_light(Light({0.0, 6.0, 0.0}));
+    render.add_light(Light({0.0, 10.0, 0.0}, 0.1));
     render.add_light(Light({0.0, -4.5, 0.0}, {1.0, 0.0, 1.0}));
+    // render.add_light(Light({0.0, -2.0, -2.0}));
+    // render.add_light(Light({3.0, -2.0, -4.0}));
+    // render.add_light(Light({-3.0, -1.0, -1.0}));
 }
 
 void load_obj(char *path) {

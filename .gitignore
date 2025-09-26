@@ -1,6 +1,7 @@
 obj
 raycast
 .cache
+.vscode
 
 flake.nix
 flake.lock
