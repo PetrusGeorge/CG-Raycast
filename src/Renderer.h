@@ -94,6 +94,7 @@ class Renderer {
 
     void init(int argc, char **argv) const;
     void set_ambient(float ambient);
+    void set_camera(Camera camera);
     void add_triangle(const Triangle &triangle);
     void add_object(std::vector<Triangle> object);
     void add_light(const Light& light);

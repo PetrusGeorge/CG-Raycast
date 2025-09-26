@@ -69,9 +69,8 @@ void Renderer::init(int argc, char **argv) const {
 }
 
 // Funções para criar o cenário
-void Renderer::set_ambient(float ambient) {
-    m_ambient = ambient;
-}
+void Renderer::set_ambient(float ambient) { m_ambient = ambient; }
+void Renderer::set_camera(Camera camera) { m_camera = camera; }
 void Renderer::add_triangle(const Triangle &triangle) { m_primitives.push_back(triangle); }
 void Renderer::add_object(std::vector<Triangle> object) {
     m_primitives.insert(m_primitives.end(), std::make_move_iterator(object.begin()),

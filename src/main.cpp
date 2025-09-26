@@ -1,7 +1,11 @@
 #include <GL/glut.h>
 #include <cmath>
+#include <iostream>
+#include <string>
 
 #include "Renderer.h"
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "tiny_obj_loader.h"
 
 void construct_scene() {
     // Função auxiliar para criar cubos
@@ -45,12 +49,75 @@ void construct_scene() {
     render.add_triangle({Vector3(-10, -5, -10), Vector3(10, -5, -10), Vector3(0, -5, 10), Color(0.4F, 0.6F, 0.4F)});
 
     // Luzes
+    render.add_light(Light({0.0, 6.0, 0.0}));
+    render.add_light(Light({0.0, -4.5, 0.0}, {1.0, 0.0, 1.0}));
+}
+
+void load_obj(char *path) {
+    tinyobj::attrib_t attrib;
+    std::vector<tinyobj::shape_t> shapes;
+    std::vector<tinyobj::material_t> materials;
+    std::string err;
+
+    // Carrega o arquivo OBJ
+    bool success = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path);
+
+    if (!err.empty()) {
+        std::cout << "Erro: " << err << std::endl;
+        exit(1);
+        }
+
+        Renderer &render = Renderer::get_instance();
+
+        for (const auto& shape : shapes) {
+        for (size_t i = 0; i < shape.mesh.indices.size(); i += 3) {
+            Vector3 triangle_vertices[3];
+            for (int j = 0; j < 3; j++) {
+                tinyobj::index_t idx = shape.mesh.indices[i + j];
+    
+                // Pega as coordenadas do vértice
+                float x = attrib.vertices[3 * idx.vertex_index + 0];
+                float y = attrib.vertices[3 * idx.vertex_index + 1];
+                float z = attrib.vertices[3 * idx.vertex_index + 2];
+    
+                triangle_vertices[j] = Vector3(x, y, z);
+            }
+
+            Color triangle_color(1, 1, 1); // Cor padrão branco
+
+            if (!shape.mesh.material_ids.empty()) {
+                int material_id = shape.mesh.material_ids[i / 3];
+                if (material_id >= 0 && material_id < materials.size()) {
+                    const auto& mat = materials[material_id];
+                    // Usa cor difusa do material
+                    triangle_color = Color(
+                        mat.diffuse[0],
+                        mat.diffuse[1],
+                        mat.diffuse[2]
+                    );
+                }
+            }
+
+            // Adiciona o triângulo
+            render.add_triangle({
+                triangle_vertices[0], 
+                triangle_vertices[1], 
+                triangle_vertices[2], 
+                triangle_color
+            });
+        }
+    }
     render.add_light(Light({0.0, 10.0, 0.0}));
-    // render.add_light(Light({0.0, 10.5, 0.0}, {1.0, 0.0, 1.0}));
+    render.set_camera(Camera({0.0, 0.0, 10.0}, {0.0,0.0,0.0}, {0.0, 1.0, 0.0}, 60.0, 1.0));
 }
 
 int main(int argc, char **argv) {
 
-    construct_scene();
+    if (argc == 2) {
+        load_obj(argv[1]);
+    } else {
+        construct_scene();
+    }
+
     Renderer::get_instance().init(argc, argv);
 }
