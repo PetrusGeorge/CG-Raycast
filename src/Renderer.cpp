@@ -1,9 +1,7 @@
 #include "Renderer.h"
 
-#include <algorithm>
 #include <cerrno>
 #include <cmath>
-#include <iostream>
 #include <iterator>
 #include <vector>
 
@@ -99,7 +97,7 @@ void Renderer::render() {
     for (int x = 0; x < m_window_width; x++) {
         for (int y = 0; y < m_window_height; y++) {
             const Vector3 ray_dir = m_camera.get_ray_direction(x, y, m_window_width, m_window_height);
-            const Color pixel_color = trace_ray(m_camera.position, ray_dir);
+            const Color pixel_color = trace_ray(m_camera.get_position(), ray_dir);
 
             // Calcula o index para buffer
             const int buffer_y = m_window_height - y - 1;
@@ -120,7 +118,7 @@ void Renderer::render() {
 void Renderer::reshape(int w, int h) {
     m_window_width = w;
     m_window_height = h;
-    m_camera.aspect_ratio = float(w) / float(h);
+    m_camera.set_aspect_ratio(float(w) / float(h));
 
     glutPostRedisplay();
 }

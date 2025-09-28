@@ -190,7 +190,7 @@ void load_obj(char *path) {
         }
     }
     render.add_light(Light({0.0, 10.0, 0.0}));
-    render.set_camera(Camera({0.0, 0.0, 10.0}, {0.0,0.0,0.0}, {0.0, 1.0, 0.0}, 60.0, 1.0));
+    render.set_camera(Camera({0.0, 0.0, 10.0}, 60.0));
 }
 
 int main(int argc, char **argv) {
