@@ -1,13 +1,16 @@
-# Implementação do <i>raycasting</i> para a disciplina de Computação Gráfica
+# Implementação do <i>ray-casting</i>
 
-Um simples programa que visa mostrar os conhecimentos adquiridos na disciplina a partir da implementação do algoritmo de <i>raycasting</i> para renderização de cenas 3D.
+Uma simples implementação do algoritmo <i>ray-casting</i> para renderização de cenas 3D.
 
 ---
 
 ## O que o código faz
-- O código é uma interface para geração de cenas utilizando o algoritmo <i>raycasting</i> de renderização 3D.
-- O usuário deve descrever o conjunto de elementos da cena (luz e objetos) a nível de código.
-- A cena será renderizada com efeitos de oclusão e sombra intrísecos ao algoritmo implementado.
+- Renderiza cenas 3D descritas por primitivas triangulares a nível de código.
+- As cores de cada pixel são calculadas a partir da interação do raio traçado com a cena.
+- São feitos cálculos de interseção dos raios projetados com as primitivas da cena para gerar efeitos de oclusão e sombreamento nas imagens.
+- É possível descrever varias luzes cuja iluminação possui as componentes ambiente e difusa, além da atenuação com a distância.
+- As cores das luzes interagem entre si e com os objetos.
+- O código também permite a leitura e renderização de arquivos .obj.
 
 ---
 
@@ -41,19 +44,42 @@ Um simples programa que visa mostrar os conhecimentos adquiridos na disciplina a
 make
 ```
 ### Execução
+```bash
+./raycast <cena>
+```
+Cenas Disponíveis:
+  1. obj <arquivo>    - Carrega cena de arquivo OBJ
+  2. towers           - Constrói cena com torres
+  3. walls            - Constrói cena com paredes
+  4. cubes            - Constrói cena com cubos
+
+Exemplo cena:
+```bash
+./raycast towers
+```
+Exemplo com obj:
+```bash
+./raycast obj Deer.obj
+```
 ---
 
 ## Principais problemas encontrados
-- Tentamos inicialmente utilizar funções nativas do OpenGL, mas claramente não deu certo.
-- Decidimos fazer o algoritmo renderizador com as primitivas sendo triângulos, dessa forma, objetos simples como esfera ficaram muito pesados e complexos de representar.
-- As cores dos objetos estavam incoerentes, pois era necessário que o produto interno do vetor normal ao objeto com o vetor que vai para a luz deve sempre ser positivo
+- Tentativa inicial de utilizar funções nativas do OpenGL, porém alterar o pipeline de renderização do OpenGL não é trivial.
+- Mesmo paralelizado, a performance é baixa.
+- Dificuldades para lidar com o sentido do vetor normal nos cálculos de luz.
+- Redimensionamento da janela causa distorções gerais.
+- Rotações de câmera inconsistentes com Vup diferente do Y do mundo.
 
 ---
 
-## 🔧 O que pode ser melhorado
-- É possível implementar uma estrutura de dados que diminuem as verificações de interseção para acelerar o código.
+## O que pode ser melhorado
+- Implementação de estruturas de dados que diminuem as verificações de interseção para acelerar a execução.
+- Adição de mais primitivas com suas funções de interseção (linhas, <i>quads</i>, esfera, <i>etc</i>).
+- Melhorar a API de descrição de cenas com mais possibilidades de formas.
+- Aprimorar o modelo de iluminação adicionando a componente especular.
+- Implementação de <i>ray-tracing</i>.
 
 ---
 
-## 👥 Contribuição da Equipe
-Foi feita o desenvolvimento em conjunto onde uma pessoa mexia no código e as outras duas auxiliavam externamente, dessa forma, todos os integrantes fizeram tudo juntos.
+## Contribuição da Equipe
+O código foi elaborado simultaneamente por todos os membros da equipe, de modo que, um integrante escrevia o código e o resto auxiliava na elaboração e lógica do programa e suas funções.
