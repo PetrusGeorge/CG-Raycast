@@ -124,32 +124,37 @@ void Renderer::keyboard(unsigned char key, int /*x*/, int /*y*/) {
     case 'w':
     case 'W':
         m_camera.move(0, 0, speed);
+        glutPostRedisplay();
         break;
     case 's':
     case 'S':
         m_camera.move(0, 0, -speed);
+        glutPostRedisplay();
         break;
     case 'a':
     case 'A':
         m_camera.move(-speed, 0, 0);
+        glutPostRedisplay();
         break;
     case 'd':
     case 'D':
         m_camera.move(speed, 0, 0);
+        glutPostRedisplay();
         break;
     case 'q':
     case 'Q':
         m_camera.move(0, speed, 0);
+        glutPostRedisplay();
         break;
     case 'e':
     case 'E':
         m_camera.move(0, -speed, 0);
+        glutPostRedisplay();
         break;
     case 27:
         exit(0);
         break;
     }
-    glutPostRedisplay();
 }
 
 void Renderer::special_keys(int key, int /*x*/, int /*y*/) {
@@ -157,18 +162,21 @@ void Renderer::special_keys(int key, int /*x*/, int /*y*/) {
     switch (key) {
     case GLUT_KEY_LEFT:
         m_camera.rotate(speed, 0);
+        glutPostRedisplay();
         break;
     case GLUT_KEY_RIGHT:
         m_camera.rotate(-speed, 0);
+        glutPostRedisplay();
         break;
     case GLUT_KEY_UP:
         m_camera.rotate(0, speed);
+        glutPostRedisplay();
         break;
     case GLUT_KEY_DOWN:
         m_camera.rotate(0, -speed);
+        glutPostRedisplay();
         break;
     }
-    glutPostRedisplay();
 }
 
 Color Renderer::trace_ray(const Vector3 &origin, const Vector3 &direction) {

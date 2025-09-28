@@ -12,6 +12,12 @@ class Camera {
     Camera(const Vector3 &pos, float fov)
         : m_position(pos), m_fov(fov) {}
 
+    Camera(const Vector3 &pos,  const Vector3 &look_at, float fov)
+        : m_position(pos), m_fov(fov), m_forward((look_at - pos).normalized()),
+          m_yaw(atan2f(m_forward.z, m_forward.x)), m_pitch(asinf(m_forward.y)),
+          m_right(Vector3(0, 1, 0).cross(m_forward).normalized()),
+          m_up(m_forward.cross(m_right).normalized()) {}
+
     void rotate(float delta_yaw, float delta_pitch) {
         m_yaw += delta_yaw;
         m_pitch += delta_pitch;
