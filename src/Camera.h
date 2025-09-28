@@ -48,7 +48,7 @@ class Camera {
         // As coordenadas Y são invertidas
         float ndc_y = 1.0F - (2.0F * screen_y / height);
 
-        // Aplica o fov para o ângulo de visão
+        // Aplica o fov para o ângulo de visão *Viewport
         const float scale = tan(m_fov * 0.5F * M_PI / 180.0F);
         ndc_x *= scale;
         ndc_y *= scale;

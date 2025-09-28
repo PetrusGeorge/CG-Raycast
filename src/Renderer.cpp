@@ -6,18 +6,21 @@
 #include <vector>
 
 // Função que checa a interseção de um raio com um triangulo
+// Fonte: https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 std::optional<float> Triangle::ray_intersect(const Vector3 &ray_origin, const Vector3 &ray_dir) const {
     const float epsilon = 0.0000001;
     const Vector3 edge1 = v1 - v0;
     const Vector3 edge2 = v2 - v0;
-    const Vector3 h = ray_dir.cross(edge2);
-    const float a = edge1.dot(h);
+    const Vector3 h = ray_dir.cross(edge2); // Normal não-normalizada
+    const float det = edge1.dot(h);
 
-    if (a > -epsilon && a < epsilon) {
-        return {}; // Ray is parallel to triangle
+    // Testa se o raio é paralelo
+    if (det > -epsilon && det < epsilon) {
+        return {};
     }
 
-    const float f = 1.0F / a;
+    // Verifica se o raio atinge dentro do triângulo
+    const float f = 1.0F / det;
     const Vector3 s = ray_origin - v0;
     const float u = f * s.dot(h);
 
@@ -32,6 +35,7 @@ std::optional<float> Triangle::ray_intersect(const Vector3 &ray_origin, const Ve
         return {};
     }
 
+    // Distância até a interseção
     const float t = f * edge2.dot(q);
     if (t < epsilon) {
         return {};
@@ -210,7 +214,7 @@ Color Renderer::trace_ray(const Vector3 &origin, const Vector3 &direction) {
         normal = normal * -1;
     }
 
-    std::vector<float> intensities;
+    std::vector<float> intensities; // Guarda a intensidade de cada luz que atinge o ponto
     // Avalia o impacto de cada luz na intensidade do raio
     for (auto& light : m_lights) {
         bool hit = false;
@@ -251,8 +255,9 @@ Color Renderer::trace_ray(const Vector3 &origin, const Vector3 &direction) {
 
     // Calulo final da cor, considerando luz ambiente, a cor do objeto e a cor da luz e sua intensidade
     Color result = closest_triangle.color * m_ambient;
+    const float diffuse = 1.0F - m_ambient;
     for (int i = 0; i < m_lights.size(); i++) {
-        result = result + (m_lights[i].color * closest_triangle.color * (intensities[i] * (1.0F - m_ambient)));
+        result = result + (m_lights[i].color * closest_triangle.color * (intensities[i] * diffuse));
     }
     result.saturate(); // Evita overflow
 

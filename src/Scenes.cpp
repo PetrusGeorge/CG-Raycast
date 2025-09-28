@@ -47,6 +47,8 @@ std::vector<Triangle> create_parallelepiped(
     return triangles;
 }
 
+// cubes: Mostra uma cenas com cubos e algumas luzes para teste básico do algoritmo
+// demonstrando efeitos de sombreamento.
 void Scenes::construct_cubes() {
     Renderer &render = Renderer::get_instance();
 
@@ -61,6 +63,7 @@ void Scenes::construct_cubes() {
     render.set_camera(Camera({0.0, 1.0, 7.5}, 60.0));
 }
 
+// towers: Demonstra a interação entre luzes de cores difenrentes e nos objetos da cena
 void Scenes::construct_towers() {
     Renderer &render = Renderer::get_instance();
 
@@ -120,10 +123,11 @@ void Scenes::construct_towers() {
     render.set_camera(Camera({0.0,0.0,10}, 60.0));
 }
 
+// walls: Demonstra a projeção das sombras em superfícies verticais e horizontais,
+// também mostra melhor o efeito da atenuação da luz.
 void Scenes::construct_walls() {
     Renderer &render = Renderer::get_instance();
 
-    // Chão da cena
     const float floor_size = 10.0F;
     const float floor_y = -5.0F;
     const Color floor_color (0.9F, 0.9F, 0.9F);
@@ -137,12 +141,10 @@ void Scenes::construct_walls() {
                         Vector3(-floor_size/2, floor_y, floor_size/2),
                         floor_color});
 
-    // Paredes
     const float wall_height = 5.0F;
     const float top_y = floor_y + wall_height;
     const Color wall_color(0.8F, 0.8F, 0.8F);
 
-    // Parede 1
     render.add_triangle({Vector3(-floor_size/2, floor_y, -floor_size/2),
                         Vector3(floor_size/2, floor_y, -floor_size/2),
                         Vector3(floor_size/2, top_y, -floor_size/2),
@@ -152,7 +154,6 @@ void Scenes::construct_walls() {
                         Vector3(-floor_size/2, top_y, -floor_size/2),
                         wall_color});
 
-    // Parede 2
     render.add_triangle({Vector3(-floor_size/2, floor_y, -floor_size/2),
                         Vector3(-floor_size/2, floor_y, floor_size/2),
                         Vector3(-floor_size/2, top_y, floor_size/2),
@@ -162,7 +163,6 @@ void Scenes::construct_walls() {
                         Vector3(-floor_size/2, top_y, -floor_size/2),
                         wall_color});
 
-    // Torre
     const float tower_w = 1.5F;
     const float tower_h = 3.0F;
     const float tower_d = 1.5F;
@@ -172,7 +172,6 @@ void Scenes::construct_walls() {
 
     render.add_object(create_parallelepiped(tower_pos, tower_w, tower_h, tower_d, tower_color));
 
-    // Luz
     const float light_height = 3.0F;
     const float light_distance = 1.0F;
 
@@ -180,9 +179,12 @@ void Scenes::construct_walls() {
     Color light_color(1.0F, 1.0F, 0.8F);
 
     render.add_light(Light(light_pos, light_color, 0.5));
+    // render.add_light(Light(Vector3(floor_size/2, floor_y + light_height, floor_size/10), Color(1.0F, 1.0F, 0.8F), 0.5));
+    // render.add_light(Light(Vector3(floor_size/10, floor_y + light_height, floor_size/2), Color(1.0F, 1.0F, 0.8F), 0.5));
     render.set_camera(Camera({-1, -2, 6.5}, 60.0));
 }
 
+// Função para importar modelos .obj
 void Scenes::load_obj(const char* path) {
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -231,6 +233,6 @@ void Scenes::load_obj(const char* path) {
             });
         }
     }
-    render.add_light(Light({0.0, 10.0, 0.0}));
-    render.set_camera(Camera({0.0, 0.0, 10.0}, 60.0));
+    render.add_light(Light({0.0, 300.0, 250.0}));
+    render.set_camera(Camera({-180.0, 300.0, 500.0}, {0.0, 190.0, 0.0}, 60.0));
 }
