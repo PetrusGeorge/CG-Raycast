@@ -1,8 +1,10 @@
 #include "Renderer.h"
 
 #include <cerrno>
+#include <chrono>
 #include <cmath>
 #include <iterator>
+#include <ratio>
 #include <vector>
 
 // Função que checa a interseção de um raio com um triangulo
@@ -84,6 +86,7 @@ void Renderer::keyboard_wrapper(unsigned char key, int x, int y) { Renderer::get
 void Renderer::special_keys_wrapper(int key, int x, int y) { Renderer::get_instance().special_keys(key, x, y); }
 
 void Renderer::render() {
+    auto start = std::chrono::high_resolution_clock::now();
     // Redimensiona o buffer da imagem caso haja redimensionamento da tela
     if (m_pixel_buffer.size() != m_window_width * m_window_height * 3) {
         m_pixel_buffer.resize(m_window_width * m_window_height * 3);
@@ -111,6 +114,10 @@ void Renderer::render() {
     glClear(GL_COLOR_BUFFER_BIT);
     glDrawPixels(m_window_width, m_window_height, GL_RGB, GL_UNSIGNED_BYTE, m_pixel_buffer.data());
     glutSwapBuffers();
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "Tempo de renderização: " << duration.count() / 1000.0 << "ms\n";
 }
 
 void Renderer::keyboard(unsigned char key, int /*x*/, int /*y*/) {
