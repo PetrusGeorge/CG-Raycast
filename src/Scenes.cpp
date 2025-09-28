@@ -118,6 +118,68 @@ void Scenes::construct_towers() {
     }
 }
 
+void Scenes::construct_walls() {
+    Renderer &render = Renderer::get_instance();
+
+    // Chão da cena
+    const float floor_size = 10.0F;
+    const float floor_y = -5.0F;
+    const Color floor_color (0.9F, 0.9F, 0.9F);
+
+    render.add_triangle({Vector3(-floor_size/2, floor_y, -floor_size/2),
+                        Vector3(floor_size/2, floor_y, -floor_size/2),
+                        Vector3(floor_size/2, floor_y, floor_size/2),
+                        floor_color});
+    render.add_triangle({Vector3(-floor_size/2, floor_y, -floor_size/2),
+                        Vector3(floor_size/2, floor_y, floor_size/2),
+                        Vector3(-floor_size/2, floor_y, floor_size/2),
+                        floor_color});
+
+    // Paredes
+    const float wall_height = 5.0F;
+    const float top_y = floor_y + wall_height;
+    const Color wall_color(0.8F, 0.8F, 0.8F);
+
+    // Parede 1
+    render.add_triangle({Vector3(-floor_size/2, floor_y, -floor_size/2),
+                        Vector3(floor_size/2, floor_y, -floor_size/2),
+                        Vector3(floor_size/2, top_y, -floor_size/2),
+                        wall_color});
+    render.add_triangle({Vector3(-floor_size/2, floor_y, -floor_size/2),
+                        Vector3(floor_size/2, top_y, -floor_size/2),
+                        Vector3(-floor_size/2, top_y, -floor_size/2),
+                        wall_color});
+
+    // Parede 2
+    render.add_triangle({Vector3(-floor_size/2, floor_y, -floor_size/2),
+                        Vector3(-floor_size/2, floor_y, floor_size/2),
+                        Vector3(-floor_size/2, top_y, floor_size/2),
+                        wall_color});
+    render.add_triangle({Vector3(-floor_size/2, floor_y, -floor_size/2),
+                        Vector3(-floor_size/2, top_y, floor_size/2),
+                        Vector3(-floor_size/2, top_y, -floor_size/2),
+                        wall_color});
+
+    // Torre
+    const float tower_w = 1.5F;
+    const float tower_h = 3.0F;
+    const float tower_d = 1.5F;
+
+    Vector3 tower_pos(0.0, floor_y + tower_h/2, 0.0);
+    Color tower_color(1.0, 1.0, 1.0);
+
+    render.add_object(create_parallelepiped(tower_pos, tower_w, tower_h, tower_d, tower_color));
+
+    // Luz
+    const float light_height = 3.0F;
+    const float light_distance = 1.0F;
+
+    Vector3 light_pos(floor_size/4, floor_y + light_height, floor_size/4);
+    Color light_color(1.0F, 1.0F, 0.8F);
+
+    render.add_light(Light(light_pos, light_color, 0.5));
+}
+
 void Scenes::load_obj(const char* path) {
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;

@@ -4,11 +4,11 @@
 #include "Renderer.h"
 #include <vector>
 
-class Scenes {
-public:
-    static void construct_cubes();
-    static void construct_towers();
-    static void load_obj(const char* path);
+namespace Scenes {
+    void construct_cubes();
+    void construct_towers();
+    void construct_walls();
+    void load_obj(const char* path);
 };
 
 #endif
