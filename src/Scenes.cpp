@@ -58,6 +58,7 @@ void Scenes::construct_cubes() {
 
     render.add_light(Light({0.0, 10.0, 0.0}, 0.1));
     render.add_light(Light({0.0, -4.5, 0.0}, {1.0, 0.0, 1.0}));
+    render.set_camera(Camera({0.0, 1.0, 7.5}, 60.0));
 }
 
 void Scenes::construct_towers() {
@@ -116,6 +117,7 @@ void Scenes::construct_towers() {
     for (int i = 0; i < 4; ++i) {
         render.add_light(Light({light_pos[i]}, light_color[i]));
     }
+    render.set_camera(Camera({0.0,0.0,10}, 60.0));
 }
 
 void Scenes::construct_walls() {
@@ -178,6 +180,7 @@ void Scenes::construct_walls() {
     Color light_color(1.0F, 1.0F, 0.8F);
 
     render.add_light(Light(light_pos, light_color, 0.5));
+    render.set_camera(Camera({-1, -2, 6.5}, 60.0));
 }
 
 void Scenes::load_obj(const char* path) {
