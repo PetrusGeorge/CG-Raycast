@@ -13,6 +13,7 @@ OBJDIR = obj
 
 SRCS = main.cpp Renderer.cpp
 OBJS = $(addprefix $(OBJDIR)/, $(SRCS:.cpp=.o))
+DEPS = $(OBJS:.o=.d)
 
 $(shell mkdir -p $(OBJDIR) $(BINDIR))
 
@@ -23,6 +24,8 @@ $(TARGET): $(OBJS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -MMD -c $< -o $@
+
+-include $(DEPS)
 
 clean:
 	rm -rf $(OBJDIR) $(BINDIR)
