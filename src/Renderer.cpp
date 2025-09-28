@@ -56,7 +56,6 @@ void Renderer::init(int argc, char **argv) const {
 
     // Register static wrapper functions
     glutDisplayFunc(display_wrapper);
-    glutReshapeFunc(reshape_wrapper);
     glutKeyboardFunc(keyboard_wrapper);
     glutSpecialFunc(special_keys_wrapper);
 
@@ -81,7 +80,6 @@ void Renderer::add_lights(std::vector<Light> lights) {
 }
 
 void Renderer::display_wrapper() { Renderer::get_instance().render(); }
-void Renderer::reshape_wrapper(int w, int h) { Renderer::get_instance().reshape(w, h); }
 void Renderer::keyboard_wrapper(unsigned char key, int x, int y) { Renderer::get_instance().keyboard(key, x, y); }
 void Renderer::special_keys_wrapper(int key, int x, int y) { Renderer::get_instance().special_keys(key, x, y); }
 
@@ -113,14 +111,6 @@ void Renderer::render() {
     glClear(GL_COLOR_BUFFER_BIT);
     glDrawPixels(m_window_width, m_window_height, GL_RGB, GL_UNSIGNED_BYTE, m_pixel_buffer.data());
     glutSwapBuffers();
-}
-
-void Renderer::reshape(int w, int h) {
-    m_window_width = w;
-    m_window_height = h;
-    m_camera.set_aspect_ratio(float(w) / float(h));
-
-    glutPostRedisplay();
 }
 
 void Renderer::keyboard(unsigned char key, int /*x*/, int /*y*/) {

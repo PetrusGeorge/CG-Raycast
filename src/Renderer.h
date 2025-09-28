@@ -70,14 +70,12 @@ class Renderer {
 
     // Funções estaticas para o FreeGLUT
     static void display_wrapper();
-    static void reshape_wrapper(int w, int h);
     static void keyboard_wrapper(unsigned char key, int x, int y);
     static void special_keys_wrapper(int key, int x, int y);
 
     void render();
     Color trace_ray(const Vector3 &origin, const Vector3 &direction);
 
-    void reshape(int w, int h);
     void keyboard(unsigned char key, int x, int y);
     void special_keys(int key, int x, int y);
 
