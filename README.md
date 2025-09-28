@@ -11,28 +11,36 @@ Um simples programa que visa mostrar os conhecimentos adquiridos na disciplina a
 
 ---
 
-## Exemplo de imagem do programa
-<!-- ![Imagem do Programa](./screenshot.png) -->
+## Imagens do programa
+![Imagem do Programa](./images/cubes.png)
 
-*Exemplo de cena com 4 cubos, chão e duas fontes de luz, sendo percebido os efeitos de oclusão e sombra corretos.*
+*Exemplo de cena: Cubes*
+
+![Imagem do Programa](./images/towers.png)
+
+*Exemplo de cena: Towers*
+
+![Imagem do Programa](./images/walls.png)
+
+*Exemplo de cena: Walls*
 
 ---
 
-## 💻 Como compilar e executar
+## Compilação e Execução
 
-### 🔧 Dependências
+### Dependências
 - C++ 17 (gcc)
 - GLUT
 - OpenGL
 
-### ▶️ Execução
+### Compilação
 1. Baixe/clone este repositório.
 2. No terminal, navegue até a pasta do projeto.
 3. Execute:
 ```bash
-make run
+make
 ```
-
+### Execução
 ---
 
 ## Principais problemas encontrados
