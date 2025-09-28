@@ -11,7 +11,7 @@ TARGET = raycast
 SRCDIR = src
 OBJDIR = obj
 
-SRCS = main.cpp Renderer.cpp
+SRCS = main.cpp Renderer.cpp Scenes.cpp
 OBJS = $(addprefix $(OBJDIR)/, $(SRCS:.cpp=.o))
 DEPS = $(OBJS:.o=.d)
 

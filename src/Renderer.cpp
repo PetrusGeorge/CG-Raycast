@@ -1,10 +1,8 @@
 #include "Renderer.h"
 
-#include <cerrno>
 #include <chrono>
 #include <cmath>
 #include <iterator>
-#include <ratio>
 #include <vector>
 
 // Função que checa a interseção de um raio com um triangulo
@@ -54,7 +52,7 @@ void Renderer::init(int argc, char **argv) const {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB);
     glutInitWindowSize(m_window_width, m_window_height);
-    glutCreateWindow("Pure Raycast Renderer with GLUT");
+    glutCreateWindow("Raycast");
 
     // Register static wrapper functions
     glutDisplayFunc(display_wrapper);
@@ -219,7 +217,7 @@ Color Renderer::trace_ray(const Vector3 &origin, const Vector3 &direction) {
             if (i == closest_idx) {
                 continue;
             }
-            
+
             const Triangle &triangle = m_primitives[i];
             if (auto t = triangle.ray_intersect(hit_point, to_light)) {
                 // Caso o ponto de interseção seja após o ponto de posição da luz
@@ -233,7 +231,7 @@ Color Renderer::trace_ray(const Vector3 &origin, const Vector3 &direction) {
         }
 
         const float intensity = normal.dot(to_light) * (1.0 / (1.0 + light.attenuation_factor * light_t));
-        
+
         // Caso o produto seja menor que 0 a luz esta no lado contrario ao triângulo
         // e portanto não deve interferir na intensidade
         if (!hit && intensity > 0) {
